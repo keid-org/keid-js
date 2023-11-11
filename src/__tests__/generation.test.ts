@@ -49,9 +49,9 @@ describe("generate 1000 KEIDs, encode and decode them to/from Base62", () => {
 
 describe("generate 1000 KEIDs, check if encoded length doesn't exceed the max", () => {
 	test.each(generate(1000))(
-		`Encoded ID length: $encodedIdLength <= ${KEID.MAX_ENCODED_LENGTH}`,
+		`Encoded ID length: $encodedIdLength <= ${KEID.ENCODED_LENGTH}`,
 		({ encodedIdLength }) => {
-			expect(encodedIdLength).toBeLessThanOrEqual(KEID.MAX_ENCODED_LENGTH);
+			expect(encodedIdLength).toBe(KEID.ENCODED_LENGTH);
 		}
 	);
 });

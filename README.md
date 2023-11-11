@@ -25,20 +25,20 @@ import { KEID } from "keid";
 const keid = new KEID();
 
 const id = keid.generate();
-// outputs: 018bbbfb-14d9-e2ce-3cdc-dc1e1635c865
+// outputs: 018bbf7d-f005-4c40-986d-74d8946b8a09
 
 const timestamp = keid.timestamp(id);
-// outputs: 1699665876185
+// outputs: 1699724783621
 
 const date = keid.date(id);
-// outputs: 2023-11-11T01:24:36.185Z
+// outputs: 2023-11-11T17:46:23.621Z
 
 /* The library also supports encoding/decoding to/from Base62.
  * This is useful for URLs and other similar contexts.
  */
 
 const encoded = keid.encode(id);
-// outputs: 2uqlYK5jgvQOOjBGolVOn
+// outputs: 4OxznMaqMVVaIOZPdcEaVk
 
 const decoded = keid.decode(encoded);
 // outputs: 018bbbfb-14d9-e2ce-3cdc-dc1e1635c865

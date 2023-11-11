@@ -1,9 +1,9 @@
 import { randomBytes, randomInt } from "crypto";
-import { addHyphens, base62ToNum, numToBase62 } from "./utils";
+import { addHyphens, base62ToNum, charset, numToBase62, reverseString } from "./utils";
 
 export class KEID {
 	public static MAX_TIMESTAMP = 281474976710655;
-	public static MAX_ENCODED_LENGTH = 22;
+	public static ENCODED_LENGTH = 22;
 	private static HEX_ID_LENGTH = 32;
 	private static MAX_RANDOM_BIGINT = 1208925819614629174706175n;
 
@@ -71,7 +71,7 @@ export class KEID {
 	 */
 	encode(keid: string) {
 		const hex = keid.replace(/-/g, "");
-		return numToBase62(BigInt(`0x${hex}`));
+		return numToBase62(BigInt(`0x${reverseString(hex)}`)).padStart(KEID.ENCODED_LENGTH, charset[0]);
 	}
 
 	// Shared internal decode method.
@@ -79,11 +79,12 @@ export class KEID {
 	private static _decode(encodedKEID: string, throwOnInvalid: true): string;
 	private static _decode(encodedKEID: string, throwOnInvalid: boolean) {
 		try {
-			if (!encodedKEID.length || encodedKEID.length >= KEID.MAX_ENCODED_LENGTH) {
+			if (encodedKEID.length !== KEID.ENCODED_LENGTH) {
 				throw new Error("Invalid encoded KEID length");
 			}
 
-			const hex = base62ToNum(encodedKEID).toString(16).padStart(KEID.HEX_ID_LENGTH, "0");
+			const revHex = base62ToNum(encodedKEID).toString(16).padStart(KEID.HEX_ID_LENGTH, "0");
+			const hex = reverseString(revHex);
 
 			if (hex.length !== KEID.HEX_ID_LENGTH) {
 				throw new Error("Invalid KEID length");

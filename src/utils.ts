@@ -12,9 +12,19 @@ export function addHyphens(id: string) {
 	);
 }
 
+export function reverseString(s: string) {
+	let r = "";
+
+	for (let i = s.length - 1; i >= 0; i--) {
+		r += s[i]!;
+	}
+
+	return r;
+}
+
 // ENCODING
 
-const charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+export const charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 const charsetLen = BigInt(charset.length);
 
 export function numToBase62(n: bigint) {
