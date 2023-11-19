@@ -3,10 +3,10 @@ import { KEID } from "..";
 const keid = new KEID();
 
 describe("input and output validation", () => {
-	const id = "018bbf7d-f005-4c40-986d-74d8946b8a09";
-	const encodedId = "4OxznMaqMVVaIOZPdcEaVk";
-	const timestamp = 1699724783621;
-	const date = new Date("2023-11-11T17:46:23.621Z");
+	const id = "018be67c-c4d9-449b-20d2-68caad2cf564";
+	const encodedId = "9h2Toc19FoFD1VkUghoG8F";
+	const timestamp = 1700379018457;
+	const date = new Date("2023-11-19T07:30:18.457Z");
 
 	// generate
 	test("generate() with valid timestamp input passes", () => {

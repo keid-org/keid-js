@@ -1,5 +1,5 @@
 import { randomBytes, randomInt } from "crypto";
-import { addHyphens, base62ToNum, charset, numToBase62, reverseString } from "./utils";
+import { addHyphens, base58ToNum, charset, numToBase58, reverseString } from "./utils";
 
 export class KEID {
 	public static MAX_TIMESTAMP = 281474976710655;
@@ -66,12 +66,12 @@ export class KEID {
 	}
 
 	/**
-	 * Encode a KEID to Base62.
+	 * Encode a KEID to Base58.
 	 * @param keid A valid KEID
 	 */
 	encode(keid: string) {
 		const hex = keid.replace(/-/g, "");
-		return numToBase62(BigInt(`0x${reverseString(hex)}`)).padStart(KEID.ENCODED_LENGTH, charset[0]);
+		return numToBase58(BigInt(`0x${reverseString(hex)}`)).padStart(KEID.ENCODED_LENGTH, charset[0]);
 	}
 
 	// Shared internal decode method.
@@ -83,7 +83,7 @@ export class KEID {
 				throw new Error("Invalid encoded KEID length");
 			}
 
-			const revHex = base62ToNum(encodedKEID).toString(16).padStart(KEID.HEX_ID_LENGTH, "0");
+			const revHex = base58ToNum(encodedKEID).toString(16).padStart(KEID.HEX_ID_LENGTH, "0");
 			const hex = reverseString(revHex);
 
 			if (hex.length !== KEID.HEX_ID_LENGTH) {
@@ -101,16 +101,16 @@ export class KEID {
 	}
 
 	/**
-	 * Decode a KEID from Base62. If `encodedKEID` is invalid, `null` is returned.
-	 * @param encodedKEID A valid KEID encoded in Base62
+	 * Decode a KEID from Base58. If `encodedKEID` is invalid, `null` is returned.
+	 * @param encodedKEID A valid KEID encoded in Base58
 	 */
 	decode(encodedKEID: string) {
 		return KEID._decode(encodedKEID, false);
 	}
 
 	/**
-	 * Decode a KEID from Base62. If `encodedKEID` is invalid, an error is thrown.
-	 * @param encodedKEID A valid KEID encoded in Base62
+	 * Decode a KEID from Base58. If `encodedKEID` is invalid, an error is thrown.
+	 * @param encodedKEID A valid KEID encoded in Base58
 	 */
 	decodeOrThrow(encodedKEID: string) {
 		return KEID._decode(encodedKEID, true);

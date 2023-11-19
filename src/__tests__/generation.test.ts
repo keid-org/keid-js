@@ -38,9 +38,9 @@ describe("generate() with a seed always returns the same time part", () => {
 	});
 });
 
-describe("generate 1000 KEIDs, encode and decode them to/from Base62", () => {
+describe("generate 1000 KEIDs, encode and decode them to/from Base58", () => {
 	test.each(generate(1000))(
-		"Base62 encoding: $id -> $encodedKEID -> $decodedKEID",
+		"Base58 encoding: $id -> $encodedKEID -> $decodedKEID",
 		({ id, decodedKEID }) => {
 			expect(decodedKEID).toBe(id);
 		}
