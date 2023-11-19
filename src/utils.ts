@@ -27,7 +27,7 @@ export function reverseString(s: string) {
 export const charset = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 const charsetLen = BigInt(charset.length);
 
-export function numToBase58(n: bigint) {
+export function numToBase(n: bigint) {
 	let encoded = "";
 
 	while (n > 0) {
@@ -38,7 +38,7 @@ export function numToBase58(n: bigint) {
 	return encoded || charset[0]!;
 }
 
-export function base58ToNum(s: string) {
+export function baseToNum(s: string) {
 	let n = 0n;
 
 	for (let i = 0; i < s.length; i++) {
