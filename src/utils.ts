@@ -24,10 +24,17 @@ export function reverseString(s: string) {
 
 // ENCODING
 
-export const charset = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-const charsetLen = BigInt(charset.length);
+export const charsets = {
+	base58: "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz",
+};
 
-export function numToBase(n: bigint) {
+export type EncodingCharset = "base64url" | keyof typeof charsets;
+type NoB64URLCharset = Exclude<EncodingCharset, "base64url">;
+
+export function numToBase(n: bigint, charsetKey: NoB64URLCharset) {
+	const charset = charsets[charsetKey];
+	const charsetLen = BigInt(charset.length);
+
 	let encoded = "";
 
 	while (n > 0) {
@@ -38,7 +45,10 @@ export function numToBase(n: bigint) {
 	return encoded || charset[0]!;
 }
 
-export function baseToNum(s: string) {
+export function baseToNum(s: string, charsetKey: NoB64URLCharset) {
+	const charset = charsets[charsetKey];
+	const charsetLen = BigInt(charset.length);
+
 	let n = 0n;
 
 	for (let i = 0; i < s.length; i++) {

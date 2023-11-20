@@ -1,5 +1,10 @@
 import { randomBytes, randomInt } from "crypto";
-import { addHyphens, baseToNum, charset, numToBase, reverseString } from "./utils";
+import type { EncodingCharset } from "./utils";
+import { addHyphens, baseToNum, charsets, numToBase, reverseString } from "./utils";
+
+export type KEIDOpts = {
+	encodingCharset?: EncodingCharset;
+};
 
 export class KEID {
 	public static readonly MAX_TIMESTAMP = 2 ** 48 - 1;
@@ -9,6 +14,11 @@ export class KEID {
 
 	private lastTimestamp: number;
 	private lastIntRandomPart = 0n;
+	private encodingCharset: EncodingCharset;
+
+	constructor(opts?: KEIDOpts) {
+		this.encodingCharset = opts?.encodingCharset ?? "base64url";
+	}
 
 	/**
 	 * Generate a new KEID.
@@ -79,7 +89,15 @@ export class KEID {
 	 */
 	public encode(keid: string) {
 		const hex = keid.replace(/-/g, "");
-		return numToBase(BigInt(`0x${reverseString(hex)}`)).padStart(KEID.ENCODED_LENGTH, charset[0]);
+
+		if (this.encodingCharset === "base64url") {
+			return Buffer.from(hex, "hex").toString("base64url");
+		} else {
+			return numToBase(BigInt(`0x${reverseString(hex)}`), this.encodingCharset).padStart(
+				KEID.ENCODED_LENGTH,
+				charsets[this.encodingCharset][0]
+			);
+		}
 	}
 
 	// Shared internal decode method.
@@ -91,8 +109,16 @@ export class KEID {
 				throw new Error("Invalid encoded KEID length");
 			}
 
-			const revHex = baseToNum(encodedKEID).toString(16).padStart(KEID.HEX_ID_LENGTH, "0");
-			const hex = reverseString(revHex);
+			let hex: string;
+
+			if (this.encodingCharset === "base64url") {
+				hex = Buffer.from(encodedKEID, "base64url").toString("hex");
+			} else {
+				const revHex = baseToNum(encodedKEID, this.encodingCharset)
+					.toString(16)
+					.padStart(KEID.HEX_ID_LENGTH, "0");
+				hex = reverseString(revHex);
+			}
 
 			if (hex.length !== KEID.HEX_ID_LENGTH) {
 				throw new Error("Invalid KEID length");

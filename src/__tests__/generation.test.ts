@@ -1,8 +1,8 @@
 import { KEID } from "..";
+import type { EncodingCharset } from "../utils";
 
-const keid = new KEID();
-
-const generate = (cycles: number, timestamp?: number) => {
+const generate = (cycles: number, charset: EncodingCharset, timestamp?: number) => {
+	const keid = new KEID({ encodingCharset: charset });
 	const results = [];
 
 	for (let i = 0; i < cycles; i++) {
@@ -29,17 +29,26 @@ describe("generate() with a seed always returns the same time part", () => {
 	const seed = 1676990893495;
 	const date = new Date("2023-02-21T14:48:13.495Z");
 
-	test.each(generate(100, seed))("$id -> $timestamp", ({ timestamp: timeResult }) => {
+	test.each(generate(100, "base64url", seed))("$id -> $timestamp", ({ timestamp: timeResult }) => {
 		expect(timeResult).toBe(seed);
 	});
 
-	test.each(generate(100, seed))("$id -> $date", ({ date: dateResult }) => {
+	test.each(generate(100, "base64url", seed))("$id -> $date", ({ date: dateResult }) => {
 		expect(dateResult).toStrictEqual(date);
 	});
 });
 
+describe("generate 1000 KEIDs, encode and decode them to/from Base64URL", () => {
+	test.each(generate(1000, "base64url"))(
+		"Base64URL encoding: $id -> $encodedKEID -> $decodedKEID",
+		({ id, decodedKEID }) => {
+			expect(decodedKEID).toBe(id);
+		}
+	);
+});
+
 describe("generate 1000 KEIDs, encode and decode them to/from Base58", () => {
-	test.each(generate(1000))(
+	test.each(generate(1000, "base58"))(
 		"Base58 encoding: $id -> $encodedKEID -> $decodedKEID",
 		({ id, decodedKEID }) => {
 			expect(decodedKEID).toBe(id);
@@ -47,9 +56,9 @@ describe("generate 1000 KEIDs, encode and decode them to/from Base58", () => {
 	);
 });
 
-describe("generate 1000 KEIDs, check if encoded length doesn't exceed the max", () => {
-	test.each(generate(1000))(
-		`Encoded ID length: $encodedIdLength <= ${KEID.ENCODED_LENGTH}`,
+describe("generate 1000 KEIDs, check if encoded length is the same", () => {
+	test.each(generate(1000, "base64url"))(
+		`Encoded ID length: $encodedIdLength === ${KEID.ENCODED_LENGTH}`,
 		({ encodedIdLength }) => {
 			expect(encodedIdLength).toBe(KEID.ENCODED_LENGTH);
 		}
