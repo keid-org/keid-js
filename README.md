@@ -23,17 +23,25 @@ npm i keid
 ```typescript
 import { KEID } from "keid";
 
-// Create new instance
+// Create a new instance.
 const keid = new KEID();
 
 const id = keid.generate();
-// outputs: 018be67c-c4d9-449b-20d2-68caad2cf564
+// 018be67c-c4d9-449b-20d2-68caad2cf564
+
+// You can also generate multiple IDs with generateMany().
+const ids = keid.generateMany(5);
+// 018beb50-8632-0afe-b1bf-dd037b6e72fb
+// 018beb50-8632-0afe-b1bf-dd037b6edbfa
+// 018beb50-8633-72a7-6016-0c4c04e1259c
+// 018beb50-8633-72a7-6016-0c4c04e14edf
+// 018beb50-8633-72a7-6016-0c4c04e16e83
 
 const timestamp = keid.timestamp(id);
-// outputs: 1700379018457
+// 1700379018457
 
 const date = keid.date(id);
-// outputs: 2023-11-19T07:30:18.457Z
+// 2023-11-19T07:30:18.457Z
 ```
 
 ## Encoding
@@ -55,23 +63,22 @@ const b64keid = new KEID({ encodingCharset: "base64url" });
 const b58keid = new KEID({ encodingCharset: "base58" });
 
 const b64encoded = b64keid.encode(id);
-// outputs: AYvmfMTZRJsg0mjKrSz1ZA
+// AYvmfMTZRJsg0mjKrSz1ZA
 
 const b58encoded = b58keid.encode(id);
-// outputs: 9h2Toc19FoFD1VkUghoG8F
+// 9h2Toc19FoFD1VkUghoG8F
 
 const b64decoded = b64keid.decode(b64encoded);
-// outputs: 018be67c-c4d9-449b-20d2-68caad2cf564
+// 018be67c-c4d9-449b-20d2-68caad2cf564
 
 const b58decoded = b58keid.decode(b58encoded);
-// outputs: 018be67c-c4d9-449b-20d2-68caad2cf564
+// 018be67c-c4d9-449b-20d2-68caad2cf564
 
 b64keid.decodeOrThrow("invalid string");
 // throws error
 
 b58keid.decodeOrThrow("invalid string");
 // throws error
-
 ```
 
 ## Generation

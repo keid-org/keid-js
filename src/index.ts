@@ -62,6 +62,28 @@ export class KEID {
 	}
 
 	/**
+	 * Generate new KEIDs.
+	 * @param count The number of KEIDs to generate
+	 * @param timestamp A seed for the time part of the KEID. Max: `281474976710655`
+	 * @throws {Error} If `timestamp` is invalid
+	 * @return {string[]} The generated KEIDs
+	 */
+	public generateMany(count: number, timestamp?: number) {
+		if (count < 1 || count > 1_000_000) {
+			throw new Error(
+				"KEID generateMany error: input count is below 1 or exceeds the maximum of 1_000_000"
+			);
+		}
+
+		const results = [];
+		for (let i = 0; i < count; i++) {
+			results.push(this.generate(timestamp));
+		}
+
+		return results;
+	}
+
+	/**
 	 * Get timestamp from a KEID.
 	 * @param keid A valid KEID
 	 * @throws {Error} If `keid` is invalid
