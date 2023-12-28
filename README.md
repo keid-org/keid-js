@@ -6,7 +6,7 @@ A K-sortable encodable unique identifier generator library for Node.js.
 
 This library is highly inspired by the [ULID spec](https://github.com/ulid/spec), but instead of creating [Crockford's Base32 strings](http://www.crockford.com/base32.html), it generates K-Sortable IDs in a UUID-like hex format. This is super useful for databases like Postgres, that have a `uuid` type to store UUIDs efficiently.
 
-You can then encode and decode these IDs to and from Base64URL or Base58.
+You can then encode and decode these IDs to and from Base64URL.
 
 If you instead want to convert ULIDs to UUID-like format and vice versa, check out this library: [ulid-uuid-converter](https://github.com/TheEdoRan/ulid-uuid-converter).
 
@@ -45,11 +45,8 @@ const date = keid.date(id);
 ```
 
 ## Encoding
-The library also supports encoding/decoding to/from Base64URL and Base58.
+The library also supports encoding/decoding to/from Base64URL.
 This is useful for URLs and other similar contexts.
-
-- Encoded Base58 IDs will be quite random looking, but are slower to compute.
-- Encoded Base64URL IDs are faster to compute, but will contain ambiguous characters and start with similar prefixes.
 
 You can decode encoded IDs with `decode()` or `decodeOrThrow()` methods.
 - `decode(encodedId)` will return `null` if `encodedId` is invalid.
@@ -59,25 +56,15 @@ You can decode encoded IDs with `decode()` or `decodeOrThrow()` methods.
 // Generated with keid.generate()
 const id = "018be67c-c4d9-449b-20d2-68caad2cf564";
 
-const b64keid = new KEID({ encodingCharset: "base64url" });
-const b58keid = new KEID({ encodingCharset: "base58" });
+const keid = new KEID();
 
-const b64encoded = b64keid.encode(id);
+const encoded = keid.encode(id);
 // AYvmfMTZRJsg0mjKrSz1ZA
 
-const b58encoded = b58keid.encode(id);
-// 9h2Toc19FoFD1VkUghoG8F
-
-const b64decoded = b64keid.decode(b64encoded);
+const decoded = keid.decode(encoded);
 // 018be67c-c4d9-449b-20d2-68caad2cf564
 
-const b58decoded = b58keid.decode(b58encoded);
-// 018be67c-c4d9-449b-20d2-68caad2cf564
-
-b64keid.decodeOrThrow("invalid string");
-// throws error
-
-b58keid.decodeOrThrow("invalid string");
+keid.decodeOrThrow("invalid string");
 // throws error
 ```
 

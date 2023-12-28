@@ -1,24 +1,13 @@
 import { randomBytes, randomInt } from "crypto";
-import type { EncodingCharset } from "./utils";
-import { addHyphens, baseToNum, charsets, numToBase, reverseString } from "./utils";
-
-export type KEIDOpts = {
-	encodingCharset?: EncodingCharset;
-};
+import { addHyphens } from "./utils";
 
 export class KEID {
 	public static readonly MAX_TIMESTAMP = 2 ** 48 - 1;
 	public static readonly ENCODED_LENGTH = 22;
-	private static readonly HEX_ID_LENGTH = 32;
 	private static readonly MAX_RANDOM_BIGINT = 2n ** 80n - 1n;
 
 	private lastTimestamp: number;
 	private lastIntRandomPart = 0n;
-	private encodingCharset: EncodingCharset;
-
-	constructor(opts?: KEIDOpts) {
-		this.encodingCharset = opts?.encodingCharset ?? "base64url";
-	}
 
 	/**
 	 * Generate a new KEID.
@@ -104,22 +93,13 @@ export class KEID {
 	}
 
 	/**
-	 * Encode a KEID to Base58.
+	 * Encode a KEID to Base64URL.
 	 * @param keid A valid KEID
 	 * @throws {Error} If `keid` is invalid
 	 * @return {string} The encoded KEID
 	 */
 	public encode(keid: string) {
-		const hex = keid.replace(/-/g, "");
-
-		if (this.encodingCharset === "base64url") {
-			return Buffer.from(hex, "hex").toString("base64url");
-		} else {
-			return numToBase(BigInt(`0x${reverseString(hex)}`), this.encodingCharset).padStart(
-				KEID.ENCODED_LENGTH,
-				charsets[this.encodingCharset][0]
-			);
-		}
+		return Buffer.from(keid.replace(/-/g, ""), "hex").toString("base64url");
 	}
 
 	// Shared internal decode method.
@@ -131,22 +111,7 @@ export class KEID {
 				throw new Error("Invalid encoded KEID length");
 			}
 
-			let hex: string;
-
-			if (this.encodingCharset === "base64url") {
-				hex = Buffer.from(encodedKEID, "base64url").toString("hex");
-			} else {
-				const revHex = baseToNum(encodedKEID, this.encodingCharset)
-					.toString(16)
-					.padStart(KEID.HEX_ID_LENGTH, "0");
-				hex = reverseString(revHex);
-			}
-
-			if (hex.length !== KEID.HEX_ID_LENGTH) {
-				throw new Error("Invalid KEID length");
-			}
-
-			return addHyphens(hex);
+			return addHyphens(Buffer.from(encodedKEID, "base64url").toString("hex"));
 		} catch (e) {
 			if (throwOnInvalid) {
 				throw e;
@@ -157,8 +122,8 @@ export class KEID {
 	}
 
 	/**
-	 * Decode a KEID from Base58. If `encodedKEID` is invalid, `null` is returned.
-	 * @param encodedKEID A valid KEID encoded in Base58
+	 * Decode a KEID from Base64URL. If `encodedKEID` is invalid, `null` is returned.
+	 * @param encodedKEID A valid KEID encoded in Base64URL
 	 * @return {string | null} The decoded KEID or `null` if `encodedKEID` is invalid
 	 */
 	public decode(encodedKEID: string) {
@@ -166,8 +131,8 @@ export class KEID {
 	}
 
 	/**
-	 * Decode a KEID from Base58. If `encodedKEID` is invalid, an error is thrown.
-	 * @param encodedKEID A valid KEID encoded in Base58
+	 * Decode a KEID from Base64URL. If `encodedKEID` is invalid, an error is thrown.
+	 * @param encodedKEID A valid KEID encoded in Base64URL
 	 * @return {string} The decoded KEID
 	 * @throws {Error} If `encodedKEID` is invalid
 	 */
