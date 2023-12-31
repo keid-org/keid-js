@@ -1,6 +1,6 @@
 # [K-sortable Encodable IDentifier](https://github.com/keid-org/keid-js)
 
-A K-sortable encodable unique identifier generator library for Node.js.
+A K-sortable encodable unique identifier generator library for Node.js and browser.
 
 ## Description
 
