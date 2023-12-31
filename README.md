@@ -79,7 +79,7 @@ Generation works like this:
    6 bytes           10 bytes
 ```
 
-Timestamp is in milliseconds. Randomness comes from `crypto.randomBytes()` function.
+Timestamp is in milliseconds. Randomness comes from `crypto.getRandomValues()` function.
 
 ### K-sorted
 
