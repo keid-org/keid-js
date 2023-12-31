@@ -6,7 +6,7 @@ A K-sortable encodable unique identifier generator library for Node.js.
 
 This library is highly inspired by the [ULID spec](https://github.com/ulid/spec), but instead of creating [Crockford's Base32 strings](http://www.crockford.com/base32.html), it generates K-Sortable IDs in a UUID-like hex format. This is super useful for databases like Postgres, that have a `uuid` type to store UUIDs efficiently.
 
-You can then encode and decode these IDs to and from Base64URL.
+You can then encode and decode these IDs to and from Base62.
 
 If you instead want to convert ULIDs to UUID-like format and vice versa, check out this library: [ulid-uuid-converter](https://github.com/TheEdoRan/ulid-uuid-converter).
 
@@ -45,7 +45,7 @@ const date = keid.date(id);
 ```
 
 ## Encoding
-The library also supports encoding/decoding to/from Base64URL.
+The library also supports encoding/decoding to/from Base62.
 This is useful for URLs and other similar contexts.
 
 You can decode encoded IDs with `decode()` or `decodeOrThrow()` methods.
@@ -59,7 +59,7 @@ const id = "018be67c-c4d9-449b-20d2-68caad2cf564";
 const keid = new KEID();
 
 const encoded = keid.encode(id);
-// AYvmfMTZRJsg0mjKrSz1ZA
+// 2UVteV17LEnHuvX0ix9wE 
 
 const decoded = keid.decode(encoded);
 // 018be67c-c4d9-449b-20d2-68caad2cf564

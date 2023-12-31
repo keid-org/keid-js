@@ -1,13 +1,15 @@
-import { randomBytes, randomInt } from "crypto";
-import { addHyphens } from "./utils";
+import BaseX from "base-x";
+import { addHyphens, randomPositive } from "./utils";
 
 export class KEID {
 	public static readonly MAX_TIMESTAMP = 2 ** 48 - 1;
-	public static readonly ENCODED_LENGTH = 22;
+	public static readonly MIN_ENCODED_LENGTH = 16;
+	public static readonly MAX_ENCODED_LENGTH = 22;
 	private static readonly MAX_RANDOM_BIGINT = 2n ** 80n - 1n;
 
 	private lastTimestamp: number;
-	private lastIntRandomPart = 0n;
+	private lastRandomPart: string;
+	private baseX = BaseX("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
 	/**
 	 * Generate a new KEID.
@@ -29,25 +31,32 @@ export class KEID {
 		// Otherwise generate completely new random sequence.
 		if (this.lastTimestamp === currentTimestamp) {
 			// Random increment range.
-			const randInc = BigInt(randomInt(1, 65536));
+			const randInc = BigInt(randomPositive(65535));
+			const lastIntRandomPart = BigInt(`0x${this.lastRandomPart}`);
 
 			// Increment random part. If bigint overflows in hex (all 'f's), restart counter.
 			// Add random increment to random part.
-			const incrementedIntRandomPart =
-				(this.lastIntRandomPart + randInc >= KEID.MAX_RANDOM_BIGINT ? 0n : this.lastIntRandomPart) +
-				randInc;
+			// 10 bytes of randomness
+			const incrementedRandomPart = (
+				(lastIntRandomPart + randInc >= KEID.MAX_RANDOM_BIGINT ? BigInt(0) : lastIntRandomPart) +
+				randInc
+			)
+				.toString(16)
+				.padStart(20, "0");
 
-			this.lastIntRandomPart = incrementedIntRandomPart;
+			this.lastRandomPart = incrementedRandomPart;
 		} else {
-			this.lastIntRandomPart = BigInt(`0x${randomBytes(10).toString("hex")}`);
+			// 10 bytes of randomness
+			this.lastRandomPart = Array.from(crypto.getRandomValues(new Uint8Array(10)))
+				.map((b) => b.toString(16))
+				.join("")
+				.padStart(20, "0");
 		}
 
 		this.lastTimestamp = currentTimestamp;
-
 		const timePart = currentTimestamp.toString(16).padStart(12, "0"); // 6 bytes timestamp (ms precision)
-		const randomPart = this.lastIntRandomPart.toString(16).padStart(20, "0"); // 10 bytes of randomness
 
-		return addHyphens(`${timePart}${randomPart}`);
+		return addHyphens(`${timePart}${this.lastRandomPart}`);
 	}
 
 	/**
@@ -93,13 +102,13 @@ export class KEID {
 	}
 
 	/**
-	 * Encode a KEID to Base64URL.
+	 * Encode a KEID to Base62.
 	 * @param keid A valid KEID
 	 * @throws {Error} If `keid` is invalid
 	 * @return {string} The encoded KEID
 	 */
 	public encode(keid: string) {
-		return Buffer.from(keid.replace(/-/g, ""), "hex").toString("base64url");
+		return this.baseX.encode(Buffer.from(keid.replace(/-/g, ""), "hex"));
 	}
 
 	// Shared internal decode method.
@@ -111,7 +120,7 @@ export class KEID {
 				throw new Error("Invalid encoded KEID length");
 			}
 
-			return addHyphens(Buffer.from(encodedKEID, "base64url").toString("hex"));
+			return addHyphens(Buffer.from(this.baseX.decode(encodedKEID)).toString("hex"));
 		} catch (e) {
 			if (throwOnInvalid) {
 				throw e;
@@ -122,8 +131,8 @@ export class KEID {
 	}
 
 	/**
-	 * Decode a KEID from Base64URL. If `encodedKEID` is invalid, `null` is returned.
-	 * @param encodedKEID A valid KEID encoded in Base64URL
+	 * Decode a KEID from Base62. If `encodedKEID` is invalid, `null` is returned.
+	 * @param encodedKEID A valid KEID encoded in Base662
 	 * @return {string | null} The decoded KEID or `null` if `encodedKEID` is invalid
 	 */
 	public decode(encodedKEID: string) {
@@ -131,8 +140,8 @@ export class KEID {
 	}
 
 	/**
-	 * Decode a KEID from Base64URL. If `encodedKEID` is invalid, an error is thrown.
-	 * @param encodedKEID A valid KEID encoded in Base64URL
+	 * Decode a KEID from Base62. If `encodedKEID` is invalid, an error is thrown.
+	 * @param encodedKEID A valid KEID encoded in Base62
 	 * @return {string} The decoded KEID
 	 * @throws {Error} If `encodedKEID` is invalid
 	 */
@@ -147,6 +156,6 @@ export class KEID {
 	 * @return {boolean} True if the encoded KEID has a valid length, otherwise false.
 	 */
 	public hasValidEncodedLength(encodedKEID: string) {
-		return encodedKEID.length === KEID.ENCODED_LENGTH;
+		return encodedKEID.length >= 16 && encodedKEID.length <= 22;
 	}
 }

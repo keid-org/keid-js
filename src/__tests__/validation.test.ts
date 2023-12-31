@@ -4,7 +4,7 @@ const keid = new KEID();
 
 describe("input and output validation", () => {
 	const id = "018be67c-c4d9-449b-20d2-68caad2cf564";
-	const encodedId = "AYvmfMTZRJsg0mjKrSz1ZA";
+	const encodedId = "2UVteV17LEnHuvX0ix9wE";
 	const timestamp = 1700379018457;
 	const date = new Date("2023-11-19T07:30:18.457Z");
 

@@ -37,20 +37,21 @@ describe("generate() with a seed always returns the same time part", () => {
 	});
 });
 
-describe("generate 1000 KEIDs, encode and decode them to/from Base64URL", () => {
+describe("generate 1000 KEIDs, encode and decode them to/from Base62", () => {
 	test.each(generate(1000))(
-		"Base64URL encoding: $id -> $encodedKEID -> $decodedKEID",
+		"Base62 encoding: $id -> $encodedKEID -> $decodedKEID",
 		({ id, decodedKEID }) => {
 			expect(decodedKEID).toBe(id);
 		}
 	);
 });
 
-describe("generate 1000 KEIDs, check if encoded length is the same", () => {
+describe("generate 1000 KEIDs, check if encoded length is between valid range", () => {
 	test.each(generate(1000))(
-		`Encoded ID length: $encodedIdLength === ${KEID.ENCODED_LENGTH}`,
+		`Encoded ID length: $encodedIdLength >= ${KEID.MIN_ENCODED_LENGTH} & <= ${KEID.MAX_ENCODED_LENGTH}`,
 		({ encodedIdLength }) => {
-			expect(encodedIdLength).toBe(KEID.ENCODED_LENGTH);
+			expect(encodedIdLength).toBeGreaterThanOrEqual(KEID.MIN_ENCODED_LENGTH);
+			expect(encodedIdLength).toBeLessThanOrEqual(KEID.MAX_ENCODED_LENGTH);
 		}
 	);
 });
