@@ -47,7 +47,7 @@ export class KEID {
 			this.lastRandomPart = incrementedRandomPart;
 		} else {
 			// 10 bytes of randomness
-			this.lastRandomPart = Array.from(crypto.getRandomValues(new Uint8Array(10)))
+			this.lastRandomPart = Array.from(globalThis.crypto.getRandomValues(new Uint8Array(10)))
 				.map((b) => b.toString(16))
 				.join("")
 				.padStart(20, "0");
