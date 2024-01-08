@@ -21,12 +21,3 @@ export function reverseString(s: string) {
 
 	return r;
 }
-
-/**
- *
- * @param max Max value (inclusive)
- * @returns Random positive number
- */
-export function randomPositive(max: number) {
-	return Math.floor(Math.random() * max) + 1;
-}

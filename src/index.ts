@@ -1,5 +1,5 @@
 import BaseX from "base-x";
-import { addHyphens, randomPositive } from "./utils";
+import { addHyphens } from "./utils";
 
 export class KEID {
 	public static readonly MAX_TIMESTAMP = 2 ** 48 - 1;
@@ -31,7 +31,7 @@ export class KEID {
 		// Otherwise generate completely new random sequence.
 		if (this.lastTimestamp === currentTimestamp) {
 			// Random increment range.
-			const randInc = BigInt(randomPositive(65535));
+			const randInc = BigInt(Math.max(crypto.getRandomValues(new Uint16Array(1))[0]!, 1));
 			const lastIntRandomPart = BigInt(`0x${this.lastRandomPart}`);
 
 			// Increment random part. If bigint overflows in hex (all 'f's), restart counter.
