@@ -1,6 +1,6 @@
 # [K-sortable Encodable IDentifier](https://github.com/keid-org/keid-js)
 
-A K-sortable encodable unique identifier generator library for Node.js and browser.
+A K-sortable encodable unique identifier generator library for Node.js.
 
 ## Description
 
@@ -79,7 +79,7 @@ Generation works like this:
    6 bytes           10 bytes
 ```
 
-Timestamp is in milliseconds. Randomness comes from `crypto.getRandomValues()` function.
+Timestamp is in milliseconds. Randomness comes from `crypto.randomBytes()` function.
 
 ### K-sorted
 

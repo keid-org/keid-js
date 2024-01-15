@@ -1,15 +1,29 @@
 import BaseX from "base-x";
-import { addHyphens } from "./utils";
+import { randomBytes, randomInt } from "crypto";
 
 export class KEID {
 	public static readonly MAX_TIMESTAMP = 2 ** 48 - 1;
 	public static readonly MIN_ENCODED_LENGTH = 16;
 	public static readonly MAX_ENCODED_LENGTH = 22;
-	private static readonly MAX_RANDOM_BIGINT = 2n ** 80n - 1n;
+	private static readonly MAX_RANDOM_BIGINT = BigInt(2 ** 80) - BigInt(1);
 
-	private lastTimestamp: number;
-	private lastRandomPart: string;
+	private lastTimestamp: number = -1;
+	private lastRandomPart: string = "";
 	private baseX = BaseX("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+
+	private static addHyphens(id: string) {
+		return (
+			id.substring(0, 8) +
+			"-" +
+			id.substring(8, 12) +
+			"-" +
+			id.substring(12, 16) +
+			"-" +
+			id.substring(16, 20) +
+			"-" +
+			id.substring(20)
+		);
+	}
 
 	/**
 	 * Generate a new KEID.
@@ -31,7 +45,7 @@ export class KEID {
 		// Otherwise generate completely new random sequence.
 		if (this.lastTimestamp === currentTimestamp) {
 			// Random increment range.
-			const randInc = BigInt(Math.max(crypto.getRandomValues(new Uint16Array(1))[0]!, 1));
+			const randInc = BigInt(randomInt(1, 65536));
 			const lastIntRandomPart = BigInt(`0x${this.lastRandomPart}`);
 
 			// Increment random part. If bigint overflows in hex (all 'f's), restart counter.
@@ -47,16 +61,13 @@ export class KEID {
 			this.lastRandomPart = incrementedRandomPart;
 		} else {
 			// 10 bytes of randomness
-			this.lastRandomPart = Array.from(globalThis.crypto.getRandomValues(new Uint8Array(10)))
-				.map((b) => b.toString(16))
-				.join("")
-				.padStart(20, "0");
+			this.lastRandomPart = randomBytes(10).toString("hex").padStart(20, "0");
 		}
 
 		this.lastTimestamp = currentTimestamp;
 		const timePart = currentTimestamp.toString(16).padStart(12, "0"); // 6 bytes timestamp (ms precision)
 
-		return addHyphens(`${timePart}${this.lastRandomPart}`);
+		return KEID.addHyphens(`${timePart}${this.lastRandomPart}`);
 	}
 
 	/**
@@ -120,7 +131,7 @@ export class KEID {
 				throw new Error("Invalid encoded KEID length");
 			}
 
-			return addHyphens(Buffer.from(this.baseX.decode(encodedKEID)).toString("hex"));
+			return KEID.addHyphens(Buffer.from(this.baseX.decode(encodedKEID)).toString("hex"));
 		} catch (e) {
 			if (throwOnInvalid) {
 				throw e;

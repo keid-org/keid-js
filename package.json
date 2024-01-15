@@ -2,7 +2,7 @@
 	"name": "keid",
 	"version": "0.0.0-development",
 	"private": false,
-	"description": "A K-sortable encodable unique identifier generator library for Node.js and browser.",
+	"description": "A K-sortable encodable unique identifier generator library for Node.js.",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"types": "dist/index.d.ts",
